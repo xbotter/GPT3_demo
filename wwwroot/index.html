@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Example Page</title>
+    <style>
+          body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      #container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      #input {
+        width: 400px;
+        height: 30px;
+        margin-right: 10px;
+        align-self: center;
+      }
+      #output {
+        width: 400px;
+        height: 100px;
+        margin-top: 10px;
+        background-color: #f2f2f2;
+        color: #333;
+        font-size: 16px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        overflow: auto;
+        align-self: center;
+      }
+      button {
+        background-color: #4CAF50; /* Green */
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin-top: 10px;
+        cursor: pointer;
+      }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <input type="text" id="input">
+        <button onclick="send()">Send</button>
+    </div>
+    <div id="output"></div>
+    <script>
+        async function send() {
+            const input = document.getElementById("input").value;
+            const output = document.getElementById("output");
+            output.innerText = "";
+            const url = "/api/stream";
+            const data = { "Prompt": input };
+            const response = await fetch(url, {
+                method: "POST",
+                body: JSON.stringify(data),
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+            var encode = new TextDecoder("utf-8");
+            var reader = response.body.getReader();
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) {
+                    break;
+                }
+                const text = encode.decode(value);
+                if (text === "<ERR>") {
+                    output.innerText = "Error";
+                    break;
+                } else {
+                    output.innerText += text;
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
