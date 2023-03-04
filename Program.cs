@@ -8,7 +8,10 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddOpenAIService(settings => { settings.ApiKey = Environment.GetEnvironmentVariable("MY_OPEN_AI_API_KEY"); });
+
+builder.Services.AddOpenAIService(settings => { settings.ApiKey =  
+   builder.Configuration["MY_OPEN_AI_API_KEY"]; 
+ });
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

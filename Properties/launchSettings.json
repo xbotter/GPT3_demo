@@ -14,7 +14,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "/",
-      "applicationUrl": "https://localhost:5170",
+      "applicationUrl": "http://localhost:5170",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "MY_OPEN_AI_API_KEY":"[MY_OPEN_AI_API_KEY]"

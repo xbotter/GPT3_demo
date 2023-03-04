@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using OpenAI.GPT3.Interfaces;
 using OpenAI.GPT3.ObjectModels;
+using OpenAI.GPT3.ObjectModels.RequestModels;
 
 [Route("api")]
 [ApiController]
@@ -23,16 +24,17 @@ public class ApiController : ControllerBase
         {
             return;
         }
-        var completion = openAIService.Completions.CreateCompletionAsStream(new OpenAI.GPT3.ObjectModels.RequestModels.CompletionCreateRequest
+        
+
+        var completion = openAIService.ChatCompletion.CreateCompletionAsStream(new OpenAI.GPT3.ObjectModels.RequestModels.ChatCompletionCreateRequest
         {
-            Prompt = BuildPrompt(input.Prompt),
+            Messages = BuildMessages(input.Prompt),
             MaxTokens = 100,
             Temperature = 0.5f,
             TopP = 1,
             FrequencyPenalty = 0,
-            PresencePenalty = 0,
-            StopAsList = new List<string> { "Q:", "A:" }
-        }, Models.TextDavinciV3);
+            PresencePenalty = 0
+        }, Models.ChatGpt3_5Turbo);
         async Task ResponseWrite(string? text) {
             if (text == null) return;
             await Response.Body.WriteAsync(Encoding.UTF8.GetBytes(text));
@@ -42,7 +44,7 @@ public class ApiController : ControllerBase
         {
             if (completionResponse.Successful)
             {
-                await ResponseWrite(completionResponse.Choices[0].Text);
+                await ResponseWrite(completionResponse.Choices[0].Message.Content);
             }else {
                 await ResponseWrite("<ERR>");
                 if(completionResponse.Error != null){
@@ -53,6 +55,12 @@ public class ApiController : ControllerBase
                 }
             }
         }
+    }
+    private List<ChatMessage> BuildMessages(string question) {
+        return new List<ChatMessage>() {
+             new ChatMessage("system",config["CharacterDescription"] ?? ""),
+             new ChatMessage("user",question)
+        };
     }
     private string BuildPrompt(string? prompt)
     {
